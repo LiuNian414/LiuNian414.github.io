@@ -282,71 +282,58 @@
             document.getElementById('classFactor').value = CLASS_FACTORS[selectedClass];
         }
 
-        // 数据收集增强版
+        // 数据收集
         function collectInputData() {
-            return {
-                name: document.getElementById('playerName').value.trim(),
-                level: parseInt(document.getElementById('level').value),
-                class: document.getElementById('playerClass').value,
-                kills: parseInt(document.getElementById('kills').value),
-                assists: parseInt(document.getElementById('assists').value),
-                resources: parseInt(document.getElementById('resources').value),
-                playerDamage: parseInt(document.getElementById('playerDamage').value),
-                buildingDamage: parseInt(document.getElementById('buildingDamage').value),
-                heal: parseInt(document.getElementById('heal').value) || 0,
-                damageTaken: parseInt(document.getElementById('damageTaken').value),
-                deaths: parseInt(document.getElementById('deaths').value),
-                revive: parseInt(document.getElementById('revive').value) || 0,
-                spring: parseInt(document.getElementById('spring').value) || 0,
-                boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
-                teamLeader: document.getElementById('teamLeader').value.trim(),
-                classFactor: parseFloat(document.getElementById('classFactor').value)
-            };
-        }
-            
-         
-        // 数据存储结构改造
-        let rawBattleData = [];
-
-        // 🔄提交数据处理
-        function submitData() {
-            const formData = {
-                date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
-                battleName: document.getElementById('battleName').value.trim() || "未命名对局",
-                player: document.getElementById('playerName').value,
-                class: document.getElementById('playerClass').value,
-                // 其他字段收集...
-                resources: parseInt(document.getElementById('resources').value) || 0,
-                buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0
-            };
-
-            rawBattleData.push(formData);
-            updateDataTable();
-        }
-
-        // 🆕表格更新函数
-        function updateDataTable() {
-            const tbody = document.getElementById('battleDataBody');
-            tbody.innerHTML = rawBattleData.map((data,index) => `
-                <tr>
-                    <td><input type="checkbox" id="check${index}"></td>
-                    <td>${data.date}</td>
-                    <td>${data.battleName}</td>
-                    <td>${data.playerName}</td>
-                    <td>${data.playerclass}</td>
-                    <td>${data.number.kills || 0}</td>
-                    <td>${data.number.assists || 0}</td>
-                    <td>${data.resources}</td>
-                    <td>${data.playerDamage}</td>
-                    <td>${data.buildingDamage}</td>
-                    <td>${data.heal || 0}</td>
-                    <td>${data.damageTaken || 0}</td>
-                    <td>${data.deaths || 0}</td>
-                    <td>${data.revive || 0}</td>
-                    <td>${data.teamLeader || '-'}</td>
-                </tr>
-            `).join('');
-        }
+        return {
+        date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
+        battleName: document.getElementById('battleName').value.trim() || "未命名对局",
+        player: document.getElementById('playerName').value.trim(),
+        class: document.getElementById('playerClass').value,
+        kills: parseInt(document.getElementById('kills').value) || 0,
+        assists: parseInt(document.getElementById('assists').value) || 0,
+        resources: parseInt(document.getElementById('resources').value) || 0,
+        playerDamage: parseInt(document.getElementById('playerDamage').value) || 0,
+        buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0,
+        heal: parseInt(document.getElementById('heal').value) || 0,
+        damageTaken: parseInt(document.getElementById('damageTaken').value) || 0,
+        deaths: parseInt(document.getElementById('deaths').value) || 0,
+        revive: parseInt(document.getElementById('revive').value) || 0,
+        spring: parseInt(document.getElementById('spring').value) || 0,
+        boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
+        teamLeader: document.getElementById('teamLeader').value.trim(),
+        classFactor: parseFloat(document.getElementById('classFactor').value) || 1.0
+    };
+}
+         // 提交数据
+function submitData() {
+    const formData = collectInputData();
+    rawBattleData.push(formData);
+    updateDataTable();
+    console.log("当前数据:", rawBattleData);  // 调试用
+}
+   
+       // 更新表格
+function updateDataTable() {
+    const tbody = document.getElementById('battleDataBody');
+    tbody.innerHTML = rawBattleData.map((data, index) => `
+        <tr>
+            <td><input type="checkbox" id="check${index}"></td>
+            <td>${data.date}</td>
+            <td>${data.battleName}</td>
+            <td>${data.player}@${data.class}</td>
+            <td>${data.kills}</td>
+            <td>${data.assists}</td>
+            <td>${data.resources}</td>
+            <td>${data.playerDamage}</td>
+            <td>${data.buildingDamage}</td>
+            <td>${data.heal}</td>
+            <td>${data.damageTaken}</td>
+            <td>${data.deaths}</td>
+            <td>${data.revive || data.spring || data.boneBurn || '-'}</td>
+            <td>${data.teamLeader}</td>
+        </tr>
+    `).join('');
+}
 
         // 🆕分析选中项功能
         function analyzeSelected() {
