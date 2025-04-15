@@ -57,6 +57,16 @@
         .input-row { margin: 12px 0; display: grid; grid-template-columns: 100px 1fr; align-items: center; }
         input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
         button { background: var(--secondary); color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; }
+
+        /* 团队数据输入区域样式 */
+.team-data {
+    margin-top: 15px;
+    background: #ecf0f1;
+    padding: 15px !important;
+}
+.team-data .input-row {
+    grid-template-columns: 100px 1fr;
+}
         
         /* 表格样式 */
         #battleTable {
@@ -151,15 +161,7 @@
         .sortable.desc::after {
             content: "↓";
         }
-        /* 团队数据输入区域样式 */
-.team-data {
-    margin-top: 15px;
-    background: #ecf0f1;
-    padding: 15px !important;
-}
-.team-data .input-row {
-    grid-template-columns: 100px 1fr;
-}
+        
     </style>
 </head>
 <body>
