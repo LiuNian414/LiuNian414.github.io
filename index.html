@@ -14,7 +14,7 @@
             grid-template-columns: 350px 1fr 1fr; 
             gap: 20px; 
             align-items: start;
-            margin-right: 150px; /* 向左缩进150px */
+            gap: 10px; /* 减少列间距从20px到10px */
         }
         
         /* 输入区域样式 */
@@ -36,9 +36,10 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     grid-column: 2 / span 2;
     overflow-x: auto;
-    min-width: 0; /* 允许内容压缩 */
-    width: calc(100% + 50px); /* 增加50px宽度 */
-    margin-right: -50px; /* 向右扩展50px */
+    /* 新增以下属性 */
+    width: auto; /* 改为自动宽度 */
+    max-width: calc(100% - 320px); /* 限制最大宽度（左侧输入区约300px+间距） */
+    margin-left: 20px; /* 与左侧保持固定间距 */
 }
         
         /* 图表区域样式 */
