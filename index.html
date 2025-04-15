@@ -90,6 +90,17 @@
             gap: 10px;
             grid-column: 1 / span 3;
         }
+        
+.button-area button:last-child {
+    margin-left: auto; /* 让删除按钮靠右 */
+    background: #f44336 !important;
+    transition: all 0.3s;
+}
+
+.button-area button:last-child:hover {
+    background: #d32f2f !important;
+    transform: scale(1.05);
+}
     </style>
 </head>
 <body>
@@ -243,8 +254,9 @@
 
         <!-- 按钮区域 -->
         <div class="button-area">
-            <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
-            <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
+    <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
+    <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
+    <button onclick="deleteSelected()" style="background:#f44336">🗑️删除选中项</button>
         </div>
 
         <!-- 图表区域 -->
@@ -360,7 +372,40 @@ function submitData() {
     rawBattleData = loadFromLocalStorage();
     updateDataTable();
 }
-
+// 删除选中数据
+function deleteSelected() {
+    // 获取所有选中的复选框
+    const checkboxes = document.querySelectorAll('#battleDataBody input[type="checkbox"]:checked');
+    
+    if (checkboxes.length === 0) {
+        alert('请至少选择一项要删除的数据');
+        return;
+    }
+    
+    if (!confirm(`确定要删除选中的 ${checkboxes.length} 条数据吗？`)) {
+        return;
+    }
+    
+    // 获取选中行的索引(倒序处理避免索引变化问题)
+    const indexesToDelete = Array.from(checkboxes)
+        .map(checkbox => parseInt(checkbox.id.replace('check', '')))
+        .sort((a, b) => b - a); // 从大到小排序
+    
+    // 从本地存储中删除数据
+    let savedData = loadFromLocalStorage();
+    indexesToDelete.forEach(index => {
+        savedData.splice(index, 1);
+    });
+    
+    // 保存修改后的数据
+    localStorage.setItem('battleData', JSON.stringify(savedData));
+    
+    // 更新界面
+    rawBattleData = savedData;
+    updateDataTable();
+    
+    alert(`已成功删除 ${indexesToDelete.length} 条数据`);
+}
 // 页面加载时
 document.addEventListener('DOMContentLoaded', () => {
     rawBattleData = loadFromLocalStorage();
