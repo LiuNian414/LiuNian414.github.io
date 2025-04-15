@@ -163,7 +163,105 @@ function collectInputData() {
         classFactor: parseFloat(document.getElementById('classFactor').value)
     };
 }
-</script>
+    // 数据存储结构
+        let battleData = {
+            players: [],
+            teams: {},
+            classStats: {}
+        };
+
+       // 增强版公式实现
+const classFormulas = {
+    '素问': (player, global) => {
+        const team = global.teams[player.teamLeader];
+        const avgHeal = team.totalHeal / team.members.filter(m => m.class === '素问').length || 1;
+        return Number(((
+            ((player.heal + player.damageTaken/1.1 + 
+            (player.revive / team.totalDeaths * 2000)) / 
+            (avgHeal * 2) * 0.4) +
+            (player.heal / 2000 * 0.25) +
+            (player.resources / 260 * 0.02) +
+            (13 - player.deaths) * 0.01 +
+            (player.revive - 15) * 0.01
+        ) * player.classFactor).toFixed(2));
+    },
+    '铁衣': (player, global) => {
+        const team = global.teams[player.teamLeader];
+        const avgDamage = team.totalDamage / team.members.filter(m => m.class !== '素问').length || 1;
+        return Number(((
+            (((
+                (player.kills + player.assists*0.35 + 
+                (player.playerDamage*1.2 + player.buildingDamage*5)/100
+                ) / avgDamage * 10
+            ) +
+            (player.damageTaken / team.totalDamageTaken * 2)
+            ) * 0.6) +
+            (player.damageTaken / 5000 * 0.35) +
+            (player.resources / 260 * 0.03) +
+            (10 - player.deaths) * 0.015
+        ) * player.classFactor).toFixed(2));
+    },
+    // 其他职业公式...
+};
+
+// 增强分析函数
+function analyze() {
+    try {
+        const player = collectInputData();
+        const global = calculateGlobalStats();
+        
+        // 执行公式计算
+        player.score = classFormulas[player.class](player, global);
+        
+        // 记录计算结果
+        console.log('计算结果：', {
+            输入数据: player,
+            团队数据: global.teams[player.teamLeader],
+            最终得分: player.score
+        });
+
+        updateDataStore(player);
+        updateVisualizations();
+        alert(`分析成功！评分：${player.score}`);
+    } catch (error) {
+        console.error('分析失败：', error);
+        alert(`分析失败：${error.message}`);
+    }
+}
+
+// 增强全局统计
+function calculateGlobalStats() {
+    const stats = { teams: {} };
+    
+    // 首次遍历：收集基础数据
+    battleData.players.forEach(player => {
+        if (!stats.teams[player.teamLeader]) {
+            stats.teams[player.teamLeader] = {
+                totalDamage: 0,
+                totalHeal: 0,
+                totalDamageTaken: 0,
+                totalDeaths: 0,
+                members: []
+            };
+        }
+        const team = stats.teams[player.teamLeader];
+        
+        team.members.push(player);
+        team.totalDamage += player.playerDamage + player.buildingDamage;
+        team.totalHeal += player.heal;
+        team.totalDamageTaken += player.damageTaken;
+        team.totalDeaths += player.deaths;
+    });
+    
+    // 二次遍历：计算平均值
+    Object.values(stats.teams).forEach(team => {
+        team.avgDamage = team.totalDamage / team.members.filter(m => m.class !== '素问').length || 1;
+        team.avgHeal = team.totalHeal / team.members.filter(m => m.class === '素问').length || 1;
+    });
+    
+    return stats;
+}
+    </script>
 
 <style>
 /* 增强样式 */
@@ -196,83 +294,4 @@ select {
     width: 150px;
 }
 </style>
-        
-// 数据存储结构
-        let battleData = {
-            players: [],
-            teams: {},
-            classStats: {}
-        };
 
-        // 职业专用公式库
-        const classFormulas = {
-            '素问': (player, globalStats) => {
-                const team = globalStats.teams[player.team];
-                return (
-                    (((player.heal + player.damageTaken/1.1 + 
-                      (player.revive / team.totalDeaths * 2000)) /
-                     (team.avgHeal * 2)) * 0.4 +
-                    (player.heal / 2000) * 0.25 +
-                    (player.resources / 260) * 0.02 +
-                    (13 - player.deaths) * 0.01 +
-                    (player.revive - 15) * 0.01) * 0.95
-                );
-            },
-            '铁衣': (player, globalStats) => {
-                const team = globalStats.teams[player.team];
-                return (
-                    ((((player.kills + player.assists*0.35 + 
-                       (player.playerDamage*1.2 + player.buildingDamage*5)/100) /
-                      team.avgDamage) * 10 +
-                     (player.damageTaken / team.totalDamageTaken) * 2) * 0.6 +
-                    (player.damageTaken / 5000) * 0.35 +
-                    (player.resources / 260) * 0.03 +
-                    (10 - player.deaths) * 0.015) * 1
-                );
-            },
-            // 其他职业公式...
-        };
-// 核心分析逻辑
-        function analyze() {
-            const player = collectInputData();
-            const globalStats = calculateGlobalStats();
-            
-            player.score = classFormulas[player.class](player, globalStats);
-            
-            updateDataStore(player);
-            updateVisualizations();
-        }
-
-        // 数据收集函数
-        function collectInputData() {
-            return {
-                name: document.getElementById('playerName').value,
-                class: document.getElementById('playerClass').value,
-                kills: parseInt(document.getElementById('kills').value),
-                // 收集其他字段...
-                team: document.getElementById('team').value,
-                classFactor: parseFloat(document.getElementById('classFactor').value)
-            };
-        }
-
-        // 全局统计计算
-        function calculateGlobalStats() {
-            return {
-                teams: calculateTeamStats(),
-                classStats: calculateClassStats()
-            };
-        }
-
-        // 可视化更新
-        function updateVisualizations() {
-            renderRadarChart();
-            renderTeamComparison();
-        }
-
-        // GitHub Pages部署准备
-        function saveData() {
-            localStorage.setItem('battleData', JSON.stringify(battleData));
-        }
-    </script>
-</body>
-</html>
