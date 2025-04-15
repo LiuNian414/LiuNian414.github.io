@@ -6,40 +6,97 @@
     <style>
         /* 完整样式表 */
         :root { --primary: #2c3e50; --secondary: #3498db; }
-        body { font-family: 'Segoe UI', sans-serif; max-width: 1280px; margin: 0 auto; }
-        .container { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-        .input-section { background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; max-width: 1280px; margin: 0 auto; padding: 20px; }
+        
+        /* 主容器改为3列布局 */
+        .main-container { 
+            display: grid; 
+            grid-template-columns: 300px 1fr 1fr; 
+            gap: 20px; 
+            align-items: start;
+        }
+        
+        /* 输入区域样式 */
+        .input-section { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            grid-column: 1;
+        }
+        
+        /* 数据表格区域样式 */
+        .data-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            grid-column: 2 / span 2;
+            overflow-x: auto;
+        }
+        
+        /* 图表区域样式 */
+        .charts { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            margin-top: 30px; 
+            grid-column: 1 / span 3;
+        }
+        
+        .chart-container { height: 500px; border: 1px solid #eee; border-radius: 8px; padding: 15px; }
+        
+        /* 输入行样式 */
         .input-row { margin: 12px 0; display: grid; grid-template-columns: 100px 1fr; align-items: center; }
         input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
         button { background: var(--secondary); color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; }
-        .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-        .chart-container { height: 500px; border: 1px solid #eee; border-radius: 8px; padding: 15px; }
-         /* 新增表格样式 */
-         #data-section {
-             background: white;
-             padding: 20px;
-             border-radius: 8px;
-             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-         }
-         #battleTable {
-             width: 100%;
-             border-collapse: collapse;
-             margin-top: 15px;
-         }
-         #battleTable th, #battleTable td {
-             padding: 12px;
-             border: 1px solid #eee;
-             text-align: left;
-         }
-         #battleTable th[contenteditable] {
-             background: #f8f9fa;
-             min-width: 120px;
-         }
+        
+        /* 表格样式 */
+        #battleTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #battleTable th, #battleTable td {
+            padding: 12px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+        #battleTable th[contenteditable] {
+            background: #f8f9fa;
+            min-width: 120px;
+        }
+        
+        /* 输入网格样式 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .special-fields [data-class] {
+            display: none;
+        }
+        
+        /* 按钮区域样式 */
+        .button-area {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            grid-column: 1 / span 3;
+        }
     </style>
 </head>
+<body>
     <h1>逆水寒帮战分析系统</h1>
-    <div class="container">
-        <!-- 左侧新增选择框 -->
+    
+    <div class="main-container">
+        <!-- 左侧输入区域 -->
         <div class="input-section">
             <!-- 新增日期和对局名称输入 -->
             <div class="input-row">
@@ -51,262 +108,262 @@
                 <input type="text" id="battleName" required>
             </div>
 
-    <!-- 基础信息 -->
-    <div class="input-grid">
-        <div class="input-row">
-            <label>玩家名称：</label>
-            <input type="text" id="playerName" required>
+            <!-- 基础信息 -->
+            <div class="input-grid">
+                <div class="input-row">
+                    <label>玩家名称：</label>
+                    <input type="text" id="playerName" required>
+                </div>
+                <div class="input-row">
+                    <label>等级：</label>
+                    <input type="number" id="level" min="1" max="90" required>
+                </div>
+                <div class="input-row">
+                    <label>职业：</label>
+                    <select id="playerClass" onchange="toggleSpecialFields()">
+                        <option value="素问">素问</option>
+                        <option value="铁衣">铁衣</option>
+                        <option value="碎梦">碎梦</option>
+                        <option value="血河">血河</option>
+                        <option value="龙吟">龙吟</option>
+                        <option value="九灵">九灵</option>
+                        <option value="神相">神相</option>
+                        <option value="玄机">玄机</option>
+                        <option value="破铁">破铁</option>
+                        <option value="天问">天问</option>
+                        <option value="潮光">潮光</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 战斗数据 -->
+            <div class="input-grid">
+                <div class="input-row">
+                    <label>击败数</label>
+                    <input type="number" id="kills" min="0" required>
+                </div>
+                <div class="input-row">
+                    <label>助攻数</label>
+                    <input type="number" id="assists" min="0" required>
+                </div>
+                <div class="input-row">
+                    <label>战备资源</label>
+                    <input type="number" id="resources" min="0" required>
+                </div>
+                <div class="input-row">
+                    <label>对玩家伤害</label>
+                    <input type="number" id="playerDamage" min="0" required>
+                </div>
+                <div class="input-row">
+                    <label>对建筑伤害</label>
+                    <input type="number" id="buildingDamage" min="0" required>
+                </div>
+                <div class="input-row">
+                    <label>治疗值</label>
+                    <input type="number" id="heal" min="0">
+                </div>
+                <div class="input-row">
+                    <label>承受伤害</label>
+                    <input type="number" id="damageTaken" min="0" required>
+                </div>
+                <div class="input-row">
+                    <label>重伤次数</label>
+                    <input type="number" id="deaths" min="0" required>
+                </div>
+            </div>
+
+            <!-- 职业特殊字段 -->
+            <div class="input-grid special-fields">
+                <div class="input-row" data-class="素问">
+                    <label>化羽次数</label>
+                    <input type="number" id="revive" min="0">
+                </div>
+                <div class="input-row" data-class="潮光">
+                    <label>清泉次数</label>
+                    <input type="number" id="spring" min="0">
+                </div>
+                <div class="input-row" data-class="九灵">
+                    <label>焚骨次数</label>
+                    <input type="number" id="boneBurn" min="0">
+                </div>
+                <div class="input-row">
+                    <label>所在团长</label>
+                    <input type="text" id="teamLeader" required>
+                </div>
+                <div class="input-row">
+                    <label>职业系数</label>
+                    <input type="number" id="classFactor" step="0.01" min="0.5" max="2.0" required>
+                </div>
+            </div>
         </div>
-        <div class="input-row">
-            <label>等级：</label>
-            <input type="number" id="level" min="1" max="90" required>
+
+        <!-- 右侧数据表格区域 -->
+        <div class="data-section">
+            <table id="battleTable">
+                <thead>
+                    <tr>
+                        <th style="width:30px">✓</th>
+                        <th>日期</th>
+                        <th>对局名称</th>
+                        <th>玩家名称职业</th>
+                        <th>击败数</th>
+                        <th>助攻数</th>
+                        <th>战备资源</th>
+                        <th>对玩家伤害</th>
+                        <th>对建筑伤害</th>
+                        <th>治疗值</th>
+                        <th>承受伤害</th>
+                        <th>重伤数</th>
+                        <th>化羽/清泉次数</th>
+                        <th>所在团长</th>
+                    </tr>
+                </thead>
+                <tbody id="battleDataBody">
+                    <!-- 数据行示例 -->
+                    <tr>
+                        <td><input type="checkbox"></td>
+                        <td>2023-08-15</td>
+                        <td>汴京决战</td>
+                        <td>剑侠情缘@素问</td>
+                        <td>5</td>
+                        <td>12</td>
+                        <td>260</td>
+                        <td>36000</td>
+                        <td>80000</td>
+                        <td>15000</td>
+                        <td>80000</td>
+                        <td>7</td>
+                        <td>7</td>
+                        <td>良哥</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="input-row">
-            <label>职业：</label>
-            <select id="playerClass" onchange="toggleSpecialFields()">
-                <option value="素问">素问</option>
-                <option value="铁衣">铁衣</option>
-                <option value="碎梦">碎梦</option>
-                <option value="血河">血河</option>
-                <option value="龙吟">龙吟</option>
-                <option value="九灵">九灵</option>
-                <option value="神相">神相</option>
-                <option value="玄机">玄机</option>
-                <option value="破铁">破铁</option>
-                <option value="天问">天问</option>
-                <option value="潮光">潮光</option>
-            </select>
+
+        <!-- 按钮区域 -->
+        <div class="button-area">
+            <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
+            <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts">
+            <div class="chart-container" id="damageChart"></div>
+            <div class="chart-container" id="contributionChart"></div>
         </div>
     </div>
 
-    <!-- 战斗数据 -->
-    <div class="input-grid">
-        <div class="input-row">
-            <label>击败数</label>
-            <input type="number" id="kills" min="0" required>
-        </div>
-        <div class="input-row">
-            <label>助攻数</label>
-            <input type="number" id="assists" min="0" required>
-        </div>
-        <div class="input-row">
-            <label>战备资源</label>
-            <input type="number" id="resources" min="0" required>
-        </div>
-        <div class="input-row">
-            <label>对玩家伤害</label>
-            <input type="number" id="playerDamage" min="0" required>
-        </div>
-        <div class="input-row">
-            <label>对建筑伤害</label>
-            <input type="number" id="buildingDamage" min="0" required>
-        </div>
-        <div class="input-row">
-            <label>治疗值</label>
-            <input type="number" id="heal" min="0">
-        </div>
-        <div class="input-row">
-            <label>承受伤害</label>
-            <input type="number" id="damageTaken" min="0" required>
-        </div>
-        <div class="input-row">
-            <label>重伤次数</label>
-            <input type="number" id="deaths" min="0" required>
-        </div>
-    </div>
+    <script>
+        // 职业系数默认值映射
+        const CLASS_FACTORS = {
+            '素问': 0.95,
+            '铁衣': 1.0,
+            '碎梦': 1.2,
+            '血河': 0.95,
+            '龙吟': 1.0,
+            '九灵': 1.0,
+            '神相': 1.0,
+            '玄机': 1.0,
+            '破铁': 1.1,
+            '天问': 1.0,
+            '潮光': 0.95
+        };
 
-    <!-- 职业特殊字段 -->
-    <div class="input-grid special-fields">
-        <div class="input-row" data-class="素问">
-            <label>化羽次数</label>
-            <input type="number" id="revive" min="0">
-        </div>
-        <div class="input-row" data-class="潮光">
-            <label>清泉次数</label>
-            <input type="number" id="spring" min="0">
-        </div>
-        <div class="input-row" data-class="九灵">
-            <label>焚骨次数</label>
-            <input type="number" id="boneBurn" min="0">
-        </div>
-        <div class="input-row">
-            <label>所在团长</label>
-            <input type="text" id="teamLeader" required>
-        </div>
-        <div class="input-row">
-            <label>职业系数</label>
-            <input type="number" id="classFactor" step="0.01" min="0.5" max="2.0" required>
-        </div>
-    </div>
-<style>
-/* 调整 .container 的布局 */
-.container {
-    display: grid;
-    grid-template-columns: 300px 1fr; /* 左侧固定宽度，右侧自适应 */
-    gap: 20px;
-    align-items: start; /* 确保内容顶对齐 */
-}
-</style>
-<!-- 新增右侧表格结构 -->
-<div class="data-section">
-    <table id="battleTable" style="background:white;color:black;border-collapse:collapse;width:100%">
-        <thead>
-            <tr style="border-bottom:2px solid #ddd">
-                <th style="padding:12px;width:30px">✓</th>
-                <th style="padding:12px">日期</th>
-                <th style="padding:12px">对局名称</th>
-                <th>玩家名称职业</th>
-                <th>击败数</th>
-                <th>助攻数</th>
-                <th>战备资源</th>
-                <th>对玩家伤害</th>
-                <th>对建筑伤害</th>
-                <th>治疗值</th>
-                <th>承受伤害</th>
-                <th>重伤数</th>
-                <th>化羽/清泉次数</th>
-                <th>所在团长</th>
-            </tr>
-        </thead>
-        <tbody id="battleDataBody">
-            <!-- 数据行示例 -->
-            <tr style="border-bottom:1px solid #eee">
-                <td><input type="checkbox"></td>
-                <td>2023-08-15</td>
-                <td>汴京决战</td>
-                <td>剑侠情缘@素问</td>
-                <td>5</td>
-                <td>12</td>
-                <td>260</td>
-                <td>36000</td>
-                <td>80000</td>
-                <td>15000</td>
-                <td>80000</td>
-                <td>7</td>
-                <td>7</td>
-                <td>良哥</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        // 动态显示职业特殊字段
+        function toggleSpecialFields() {
+            const selectedClass = document.getElementById('playerClass').value;
+            document.querySelectorAll('.special-fields [data-class]').forEach(field => {
+                field.style.display = field.dataset.class === selectedClass ? 'flex' : 'none';
+            });
+            
+            // 自动填充职业系数
+            document.getElementById('classFactor').value = CLASS_FACTORS[selectedClass];
+        }
 
-<!-- 按钮区改造 -->
-<div style="margin-top:20px;display:flex;gap:10px">
-    <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
-    <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
-</div>
-<script>
-// 职业系数默认值映射
-const CLASS_FACTORS = {
-    '素问': 0.95,
-    '铁衣': 1.0,
-    '碎梦': 1.2,
-    '血河': 0.95,
-    '龙吟': 1.0,
-    '九灵': 1.0,
-    '神相': 1.0,
-    '玄机': 1.0,
-    '破铁': 1.1,
-    '天问': 1.0,
-    '潮光': 0.95
-};
+        // 数据收集增强版
+        function collectInputData() {
+            return {
+                name: document.getElementById('playerName').value.trim(),
+                level: parseInt(document.getElementById('level').value),
+                class: document.getElementById('playerClass').value,
+                kills: parseInt(document.getElementById('kills').value),
+                assists: parseInt(document.getElementById('assists').value),
+                resources: parseInt(document.getElementById('resources').value),
+                playerDamage: parseInt(document.getElementById('playerDamage').value),
+                buildingDamage: parseInt(document.getElementById('buildingDamage').value),
+                heal: parseInt(document.getElementById('heal').value) || 0,
+                damageTaken: parseInt(document.getElementById('damageTaken').value),
+                deaths: parseInt(document.getElementById('deaths').value),
+                revive: parseInt(document.getElementById('revive').value) || 0,
+                spring: parseInt(document.getElementById('spring').value) || 0,
+                boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
+                teamLeader: document.getElementById('teamLeader').value.trim(),
+                classFactor: parseFloat(document.getElementById('classFactor').value)
+            };
+        }
+            
+         
+        // 数据存储结构改造
+        let rawBattleData = [];
 
-// 动态显示职业特殊字段
-function toggleSpecialFields() {
-    const selectedClass = document.getElementById('playerClass').value;
-    document.querySelectorAll('.special-fields [data-class]').forEach(field => {
-        field.style.display = field.dataset.class === selectedClass ? 'flex' : 'none';
-    });
-    
-    // 自动填充职业系数
-    document.getElementById('classFactor').value = CLASS_FACTORS[selectedClass];
-}
+        // 🔄提交数据处理
+        function submitData() {
+            const formData = {
+                date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
+                battleName: document.getElementById('battleName').value.trim() || "未命名对局",
+                player: document.getElementById('playerName').value,
+                class: document.getElementById('playerClass').value,
+                // 其他字段收集...
+                resources: parseInt(document.getElementById('resources').value) || 0,
+                buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0
+            };
 
-// 数据收集增强版
-function collectInputData() {
-    return {
-        name: document.getElementById('playerName').value.trim(),
-        level: parseInt(document.getElementById('level').value),
-        class: document.getElementById('playerClass').value,
-        kills: parseInt(document.getElementById('kills').value),
-        assists: parseInt(document.getElementById('assists').value),
-        resources: parseInt(document.getElementById('resources').value),
-        playerDamage: parseInt(document.getElementById('playerDamage').value),
-        buildingDamage: parseInt(document.getElementById('buildingDamage').value),
-        heal: parseInt(document.getElementById('heal').value) || 0,
-        damageTaken: parseInt(document.getElementById('damageTaken').value),
-        deaths: parseInt(document.getElementById('deaths').value),
-        revive: parseInt(document.getElementById('revive').value) || 0,
-        spring: parseInt(document.getElementById('spring').value) || 0,
-        boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
-        teamLeader: document.getElementById('teamLeader').value.trim(),
-        classFactor: parseFloat(document.getElementById('classFactor').value)
-    };
-}
-    
-     
-// 数据存储结构改造
-let rawBattleData = [];
+            rawBattleData.push(formData);
+            updateDataTable();
+        }
 
-// 🔄提交数据处理
-function submitData() {
-    const formData = {
-        date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
-        battleName: document.getElementById('battleName').value.trim() || "未命名对局",
-        player: document.getElementById('playerName').value,
-        class: document.getElementById('playerClass').value,
-        // 其他字段收集...
-        resources: parseInt(document.getElementById('resources').value) || 0,
-        buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0
-    };
+        // 🆕表格更新函数
+        function updateDataTable() {
+            const tbody = document.getElementById('battleDataBody');
+            tbody.innerHTML = rawBattleData.map((data,index) => `
+                <tr>
+                    <td><input type="checkbox" id="check${index}"></td>
+                    <td>${data.date}</td>
+                    <td>${data.battleName}</td>
+                    <td>${data.player}@${data.class}</td>
+                    <td>${data.kills || 0}</td>
+                    <td>${data.assists || 0}</td>
+                    <td>${data.resources}</td>
+                    <td>${data.buildingDamage}</td>
+                    <td>${data.heal || 0}</td>
+                    <td>${data.damageTaken || 0}</td>
+                    <td>${data.deaths || 0}</td>
+                    <td>${data.deathLeader || '-'}</td>
+                    <td>${data.teamLeader || '-'}</td>
+                </tr>
+            `).join('');
+        }
 
-    rawBattleData.push(formData);
-    updateDataTable();
-}
+        // 🆕分析选中项功能
+        function analyzeSelected() {
+            const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
+                .map((checkbox,index) => checkbox.checked ? index : -1)
+                .filter(i => i >= 0);
 
-// 🆕表格更新函数
-function updateDataTable() {
-    const tbody = document.getElementById('battleDataBody');
-    tbody.innerHTML = rawBattleData.map((data,index) => `
-        <tr>
-            <td><input type="checkbox" id="check${index}"></td>
-            <td>${data.date}</td>
-            <td>${data.battleName}</td>
-            <td>${data.player}@${data.class}</td>
-            <td>${data.kills || 0}</td>
-            <td>${data.assists || 0}</td>
-            <td>${data.resources}</td>
-            <td>${data.buildingDamage}</td>
-            <td>${data.heal || 0}</td>
-            <td>${data.damageTaken || 0}</td>
-            <td>${data.deaths || 0}</td>
-            <td>${data.deathLeader || '-'}</td>
-            <td>${data.teamLeader || '-'}</td>
-        </tr>
-    `).join('');
-}
+            selectedIndexes.forEach(index => {
+                const data = rawBattleData[index];
+                const score = calculateScore(data); // 调用计算公式
+                alert(`[${data.battleName}] ${data.player} 得分：${score.toFixed(2)}`);
+            });
+        }
 
-// 🆕分析选中项功能
-function analyzeSelected() {
-    const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
-        .map((checkbox,index) => checkbox.checked ? index : -1)
-        .filter(i => i >= 0);
-
-    selectedIndexes.forEach(index => {
-        const data = rawBattleData[index];
-        const score = calculateScore(data); // 调用计算公式
-        alert(`[${data.battleName}] ${data.player} 得分：${score.toFixed(2)}`);
-    });
-}
-
-// 计算公式封装
-function calculateScore(data) {
-    // 根据职业调用不同公式
-    const formula = classFormulas[data.class];
-    return formula ? formula(data) : 0;
-}
-</script>
-
+        // 计算公式封装
+        function calculateScore(data) {
+            // 根据职业调用不同公式
+            const formula = classFormulas[data.class];
+            return formula ? formula(data) : 0;
+        }
+    </script>
 <style>
 /* 增强样式 */
 .input-grid {
@@ -338,4 +395,5 @@ select {
     width: 150px;
 }
 </style>
-
+</body>
+</html>
