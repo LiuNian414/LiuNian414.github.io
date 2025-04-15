@@ -90,17 +90,41 @@
             gap: 10px;
             grid-column: 1 / span 3;
         }
-        
-.button-area button:last-child {
-    margin-left: auto; /* 让删除按钮靠右 */
-    background: #f44336 !important;
-    transition: all 0.3s;
-}
 
-.button-area button:last-child:hover {
-    background: #d32f2f !important;
-    transform: scale(1.05);
-}
+        .button-area button:last-child {
+            margin-left: auto; /* 让删除按钮靠右 */
+            background: #f44336 !important;
+            transition: all 0.3s;
+        }
+
+        .button-area button:last-child:hover {
+            background: #d32f2f !important;
+            transform: scale(1.05);
+        }
+        
+        /* 排序按钮样式 */
+        .sortable {
+            cursor: pointer;
+            position: relative;
+            padding-right: 20px;
+        }
+        
+        .sortable::after {
+            content: "⇅";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+        }
+        
+        .sortable.asc::after {
+            content: "↑";
+        }
+        
+        .sortable.desc::after {
+            content: "↓";
+        }
     </style>
 </head>
 <body>
@@ -213,20 +237,20 @@
                 <thead>
                     <tr>
                         <th style="width:30px">✓</th>
-                        <th>战斗日期</th>
-                        <th>对局名称</th>
-                        <th>玩家名称</th>
-                        <th>职业</th>
-                        <th>击败数</th>
-                        <th>助攻数</th>
-                        <th>战备资源</th>
-                        <th>对玩家伤害</th>
-                        <th>对建筑伤害</th>
-                        <th>治疗值</th>
-                        <th>承受伤害</th>
-                        <th>重伤数</th>
-                        <th>化羽/清泉次数</th>
-                        <th>所在团长</th>
+                        <th class="sortable" onclick="sortTable(1)">战斗日期</th>
+                        <th class="sortable" onclick="sortTable(2)">对局名称</th>
+                        <th class="sortable" onclick="sortTable(3)">玩家名称</th>
+                        <th class="sortable" onclick="sortTable(4)">职业</th>
+                        <th class="sortable" onclick="sortTable(5)">击败数</th>
+                        <th class="sortable" onclick="sortTable(6)">助攻数</th>
+                        <th class="sortable" onclick="sortTable(7)">战备资源</th>
+                        <th class="sortable" onclick="sortTable(8)">对玩家伤害</th>
+                        <th class="sortable" onclick="sortTable(9)">对建筑伤害</th>
+                        <th class="sortable" onclick="sortTable(10)">治疗值</th>
+                        <th class="sortable" onclick="sortTable(11)">承受伤害</th>
+                        <th class="sortable" onclick="sortTable(12)">重伤数</th>
+                        <th class="sortable" onclick="sortTable(13)">化羽/清泉次数</th>
+                        <th class="sortable" onclick="sortTable(14)">所在团长</th>
                     </tr>
                 </thead>
                 <tbody id="battleDataBody">
@@ -254,9 +278,9 @@
 
         <!-- 按钮区域 -->
         <div class="button-area">
-    <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
-    <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
-    <button onclick="deleteSelected()" style="background:#f44336">🗑️删除选中项</button>
+            <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
+            <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
+            <button onclick="deleteSelected()" style="background:#f44336">🗑️删除选中项</button>
         </div>
 
     <script>
@@ -288,134 +312,229 @@
 
         // 数据收集
         function collectInputData() {
-        return {
-        date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
-        battleName: document.getElementById('battleName').value.trim() || "未命名对局",
-        player: document.getElementById('playerName').value.trim(),
-        class: document.getElementById('playerClass').value,
-        kills: parseInt(document.getElementById('kills').value) || 0,
-        assists: parseInt(document.getElementById('assists').value) || 0,
-        resources: parseInt(document.getElementById('resources').value) || 0,
-        playerDamage: parseInt(document.getElementById('playerDamage').value) || 0,
-        buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0,
-        heal: parseInt(document.getElementById('heal').value) || 0,
-        damageTaken: parseInt(document.getElementById('damageTaken').value) || 0,
-        deaths: parseInt(document.getElementById('deaths').value) || 0,
-        revive: parseInt(document.getElementById('revive').value) || 0,
-        spring: parseInt(document.getElementById('spring').value) || 0,
-        boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
-        teamLeader: document.getElementById('teamLeader').value.trim(),
-        classFactor: parseFloat(document.getElementById('classFactor').value) || 1.0
-    };
-}
+            return {
+                date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
+                battleName: document.getElementById('battleName').value.trim() || "未命名对局",
+                player: document.getElementById('playerName').value.trim(),
+                class: document.getElementById('playerClass').value,
+                kills: parseInt(document.getElementById('kills').value) || 0,
+                assists: parseInt(document.getElementById('assists').value) || 0,
+                resources: parseInt(document.getElementById('resources').value) || 0,
+                playerDamage: parseInt(document.getElementById('playerDamage').value) || 0,
+                buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0,
+                heal: parseInt(document.getElementById('heal').value) || 0,
+                damageTaken: parseInt(document.getElementById('damageTaken').value) || 0,
+                deaths: parseInt(document.getElementById('deaths').value) || 0,
+                revive: parseInt(document.getElementById('revive').value) || 0,
+                spring: parseInt(document.getElementById('spring').value) || 0,
+                boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
+                teamLeader: document.getElementById('teamLeader').value.trim(),
+                classFactor: parseFloat(document.getElementById('classFactor').value) || 1.0
+            };
+        }
+        
         let rawBattleData = [];
-         // 提交数据
-function submitData() {
-    const formData = collectInputData();
-    saveToLocalStorage(formData);
-    rawBattleData = loadFromLocalStorage(); // 重新加载数据
-    updateDataTable(); // 更新表格内容
-    console.log("当前数据:", rawBattleData); // 调试输出
-}
- 
-       // 更新表格
-function updateDataTable() {
-    const tbody = document.getElementById('battleDataBody');
-    tbody.innerHTML = rawBattleData.map((data, index) => `
-        <tr>
-            <td><input type="checkbox" id="check${index}"></td>
-            <td>${data.date}</td>
-            <td>${data.battleName}</td>
-            <td>${data.player}</td>
-            <td>${data.class}</td>
-            <td>${data.kills}</td>
-            <td>${data.assists}</td>
-            <td>${data.resources}</td>
-            <td>${data.playerDamage}</td>
-            <td>${data.buildingDamage}</td>
-            <td>${data.heal}</td>
-            <td>${data.damageTaken}</td>
-            <td>${data.deaths}</td>
-            <td>${data.revive || data.spring || data.boneBurn || '-'}</td>
-            <td>${data.teamLeader}</td>
-        </tr>
-    `).join('');
-}
-  document.addEventListener('DOMContentLoaded', () => {
-    rawBattleData = loadFromLocalStorage();
-    updateDataTable();  // 确保表格正确渲染
-});
         
-// 保存数据到localStorage
-function saveToLocalStorage(data) {
-    const savedData = JSON.parse(localStorage.getItem('battleData') || '[]');
-    savedData.push(data);
-    localStorage.setItem('battleData', JSON.stringify(savedData));
-}
-
-// 从localStorage加载数据
-function loadFromLocalStorage() {
-    return JSON.parse(localStorage.getItem('battleData') || '[]');
-}
-
-// 修改submitData函数
-function submitData() {
-    const formData = collectInputData();
-    saveToLocalStorage(formData);
-    rawBattleData = loadFromLocalStorage();
-    updateDataTable();
-}
-// 删除选中数据
-function deleteSelected() {
-    // 获取所有选中的复选框
-    const checkboxes = document.querySelectorAll('#battleDataBody input[type="checkbox"]:checked');
-    
-    if (checkboxes.length === 0) {
-        alert('请至少选择一项要删除的数据');
-        return;
-    }
-    
-    if (!confirm(`确定要删除选中的 ${checkboxes.length} 条数据吗？`)) {
-        return;
-    }
-    
-    // 获取选中行的索引(倒序处理避免索引变化问题)
-    const indexesToDelete = Array.from(checkboxes)
-        .map(checkbox => parseInt(checkbox.id.replace('check', '')))
-        .sort((a, b) => b - a); // 从大到小排序
-    
-    // 从本地存储中删除数据
-    let savedData = loadFromLocalStorage();
-    indexesToDelete.forEach(index => {
-        savedData.splice(index, 1);
-    });
-    
-    // 保存修改后的数据
-    localStorage.setItem('battleData', JSON.stringify(savedData));
-    
-    // 更新界面
-    rawBattleData = savedData;
-    updateDataTable();
-    
-    alert(`已成功删除 ${indexesToDelete.length} 条数据`);
-}
-// 页面加载时
-document.addEventListener('DOMContentLoaded', () => {
-    rawBattleData = loadFromLocalStorage();
-    updateDataTable();
-});
+        // 提交数据
+        function submitData() {
+            const formData = collectInputData();
+            saveToLocalStorage(formData);
+            rawBattleData = loadFromLocalStorage(); // 重新加载数据
+            updateDataTable(); // 更新表格内容
+            console.log("当前数据:", rawBattleData); // 调试输出
+        }
         
-        // 🆕分析选中项功能
+        // 更新表格
+        function updateDataTable() {
+            const tbody = document.getElementById('battleDataBody');
+            tbody.innerHTML = rawBattleData.map((data, index) => `
+                <tr>
+                    <td><input type="checkbox" id="check${index}"></td>
+                    <td>${data.date}</td>
+                    <td>${data.battleName}</td>
+                    <td>${data.player}</td>
+                    <td>${data.class}</td>
+                    <td>${data.kills}</td>
+                    <td>${data.assists}</td>
+                    <td>${data.resources}</td>
+                    <td>${data.playerDamage}</td>
+                    <td>${data.buildingDamage}</td>
+                    <td>${data.heal}</td>
+                    <td>${data.damageTaken}</td>
+                    <td>${data.deaths}</td>
+                    <td>${data.revive || data.spring || data.boneBurn || '-'}</td>
+                    <td>${data.teamLeader}</td>
+                </tr>
+            `).join('');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            rawBattleData = loadFromLocalStorage();
+            updateDataTable();  // 确保表格正确渲染
+        });
+        
+        // 保存数据到localStorage
+        function saveToLocalStorage(data) {
+            const savedData = JSON.parse(localStorage.getItem('battleData') || '[]');
+            savedData.push(data);
+            localStorage.setItem('battleData', JSON.stringify(savedData));
+        }
+
+        // 从localStorage加载数据
+        function loadFromLocalStorage() {
+            return JSON.parse(localStorage.getItem('battleData') || '[]');
+        }
+
+        // 删除选中数据
+        function deleteSelected() {
+            // 获取所有选中的复选框
+            const checkboxes = document.querySelectorAll('#battleDataBody input[type="checkbox"]:checked');
+            
+            if (checkboxes.length === 0) {
+                alert('请至少选择一项要删除的数据');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${checkboxes.length} 条数据吗？`)) {
+                return;
+            }
+            
+            // 获取选中行的索引(倒序处理避免索引变化问题)
+            const indexesToDelete = Array.from(checkboxes)
+                .map(checkbox => parseInt(checkbox.id.replace('check', '')))
+                .sort((a, b) => b - a); // 从大到小排序
+            
+            // 从本地存储中删除数据
+            let savedData = loadFromLocalStorage();
+            indexesToDelete.forEach(index => {
+                savedData.splice(index, 1);
+            });
+            
+            // 保存修改后的数据
+            localStorage.setItem('battleData', JSON.stringify(savedData));
+            
+            // 更新界面
+            rawBattleData = savedData;
+            updateDataTable();
+            
+            alert(`已成功删除 ${indexesToDelete.length} 条数据`);
+        }
+        
+        // 页面加载时
+        document.addEventListener('DOMContentLoaded', () => {
+            rawBattleData = loadFromLocalStorage();
+            updateDataTable();
+        });
+        
+        // 表格排序功能
+        function sortTable(columnIndex) {
+            const table = document.getElementById('battleTable');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const header = table.querySelectorAll('th')[columnIndex];
+            
+            // 清除其他列的排序状态
+            document.querySelectorAll('.sortable').forEach(th => {
+                if (th !== header) {
+                    th.classList.remove('asc', 'desc');
+                }
+            });
+            
+            // 切换排序方向
+            const isAsc = header.classList.contains('asc');
+            header.classList.toggle('asc', !isAsc);
+            header.classList.toggle('desc', isAsc);
+            
+            // 排序数据
+            rawBattleData.sort((a, b) => {
+                // 获取对应列的值
+                let aValue, bValue;
+                
+                // 根据列索引获取对应的数据字段
+                switch(columnIndex) {
+                    case 1: aValue = a.date; bValue = b.date; break;
+                    case 2: aValue = a.battleName; bValue = b.battleName; break;
+                    case 3: aValue = a.player; bValue = b.player; break;
+                    case 4: aValue = a.class; bValue = b.class; break;
+                    case 5: aValue = a.kills; bValue = b.kills; break;
+                    case 6: aValue = a.assists; bValue = b.assists; break;
+                    case 7: aValue = a.resources; bValue = b.resources; break;
+                    case 8: aValue = a.playerDamage; bValue = b.playerDamage; break;
+                    case 9: aValue = a.buildingDamage; bValue = b.buildingDamage; break;
+                    case 10: aValue = a.heal; bValue = b.heal; break;
+                    case 11: aValue = a.damageTaken; bValue = b.damageTaken; break;
+                    case 12: aValue = a.deaths; bValue = b.deaths; break;
+                    case 13: 
+                        aValue = a.revive || a.spring || a.boneBurn || 0; 
+                        bValue = b.revive || b.spring || b.boneBurn || 0; 
+                        break;
+                    case 14: aValue = a.teamLeader; bValue = b.teamLeader; break;
+                    default: return 0;
+                }
+                
+                // 比较逻辑
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    return isAsc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                } else {
+                    return isAsc ? (aValue - bValue) : (bValue - aValue);
+                }
+            });
+            
+            // 更新表格
+            updateDataTable();
+        }
+        
+        // 计算素问评分
+        function calculateSuwenScore(data) {
+            // 计算全团重伤次数
+            const totalDeaths = rawBattleData.reduce((sum, item) => sum + (item.deaths || 0), 0);
+            // 计算团平均奶量
+            const totalHeal = rawBattleData.reduce((sum, item) => sum + (item.heal || 0), 0);
+            const avgHeal = totalHeal / Math.max(1, rawBattleData.length);
+            
+            // 素问公式
+            const score = (
+                (
+                    (
+                        (data.heal + data.damageTaken/1.1 + data.revive/totalDeaths*2000) / 
+                        Math.max(1, avgHeal) * 2
+                    ) * 0.4 + 
+                    data.heal/2000 * 0.25 + 
+                    data.resources/260 * 0.02 + 
+                    (13 - data.deaths) * 0.01 + 
+                    (data.revive - 15) * 0.01
+                ) * data.classFactor
+            );
+            
+            return score;
+        }
+        
+        // 职业评分公式映射
+        const classFormulas = {
+            '素问': calculateSuwenScore
+            // 可以添加其他职业的评分公式
+        };
+        
+        // 分析选中项功能
         function analyzeSelected() {
             const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
                 .map((checkbox,index) => checkbox.checked ? index : -1)
                 .filter(i => i >= 0);
 
+            if (selectedIndexes.length === 0) {
+                alert('请至少选择一项要分析的数据');
+                return;
+            }
+            
+            let analysisResults = [];
+            
             selectedIndexes.forEach(index => {
                 const data = rawBattleData[index];
                 const score = calculateScore(data); // 调用计算公式
-                alert(`[${data.battleName}] ${data.player} 得分：${score.toFixed(2)}`);
+                analysisResults.push(`[${data.battleName}] ${data.player}(${data.class}) 得分：${score.toFixed(2)}`);
             });
+            
+            alert(analysisResults.join('\n\n'));
         }
 
         // 计算公式封装
@@ -425,36 +544,5 @@ document.addEventListener('DOMContentLoaded', () => {
             return formula ? formula(data) : 0;
         }
     </script>
-<style>
-/* 增强样式 */
-.input-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 12px;
-    margin: 15px 0;
-    padding: 10px;
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.input-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.special-fields [data-class] {
-    display: none;
-}
-
-input[type="number"] {
-    width: 100px;
-}
-
-select {
-    width: 150px;
-}
-</style>
 </body>
 </html>
