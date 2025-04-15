@@ -91,25 +91,25 @@
         }
         
         /* 按钮区域样式 */
-        .button-area {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            grid-column: 2 / span 2; /* 与data-section保持相同列宽 */
-    padding-right: 20px; /* 与section的padding匹配 */
-    box-sizing: border-box;
-        }
+        button-area {
+    display: grid;
+    grid-template-columns: 300px 1fr; /* 第一列宽度与input-section相同 */
+    gap: 10px;
+    margin-top: 20px;
+}
 
-        .button-area button:last-child {
-            margin-left: auto; /* 让删除按钮靠右 */
-            background: #f44336 !important;
-            transition: all 0.3s;
-        }
 
-        .button-area button:last-child:hover {
-            background: #d32f2f !important;
-            transform: scale(1.05);
-        }
+        .button-area button:first-child {
+    grid-column: 1; /* 放在第一列 */
+    margin-left: 0;
+    width: calc(100% - 20px); /* 减去input-section的padding */
+}
+
+        /* 其他按钮保持右对齐 */
+.button-area button:last-child {
+    margin-left: auto;
+    grid-column: 2;
+}
         
         /* 排序按钮样式 */
         .sortable {
@@ -287,10 +287,15 @@
 
         <!-- 按钮区域 -->
         <div class="button-area">
-            <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
-            <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
-            <button onclick="deleteSelected()" style="background:#f44336">🗑️删除选中项</button>
-        </div>
+    <!-- 第一列（与input-section同宽） -->
+    <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
+    <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
+    
+    <!-- 第二列（右侧按钮组） -->
+    <div class="right-buttons">
+        <button onclick="deleteSelected()" style="background:#f44336">🗑️删除选中项</button>
+    </div>
+</div>
 
     <script>
         // 职业系数默认值映射
