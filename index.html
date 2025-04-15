@@ -551,54 +551,7 @@
             updateDataTable();
         }
         
-        // 计算素问评分
-        function calculateSuwenScore(data) {
-    // 使用手动输入的团队数据
-    const totalDeaths = data.totalDeaths || 1; // 防止除以0
-    const avgHeal = data.avgHeal || 1;
-    
-    const score = (
-        (
-            (
-                (data.heal + data.damageTaken/1.1 + data.revive/totalDeaths*2000) / 
-                avgHeal * 2
-            ) * 0.4 + 
-            data.heal/2000 * 0.25 + 
-            data.resources/260 * 0.02 + 
-            (13 - data.deaths) * 0.01 + 
-            (data.revive - 15) * 0.01
-        ) * data.classFactor
-    );
-    return score;
-}
         
-        // 职业评分公式映射
-        const classFormulas = {
-            '素问': calculateSuwenScore
-            // 可以添加其他职业的评分公式
-        };
-        
-        // 分析选中项功能
-        function analyzeSelected() {
-            const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
-                .map((checkbox,index) => checkbox.checked ? index : -1)
-                .filter(i => i >= 0);
-
-            if (selectedIndexes.length === 0) {
-                alert('请至少选择一项要分析的数据');
-                return;
-            }
-            
-            let analysisResults = [];
-            
-            selectedIndexes.forEach(index => {
-                const data = rawBattleData[index];
-                const score = calculateScore(data); // 调用计算公式
-                analysisResults.push(`[${data.battleName}] ${data.player}(${data.class}) 得分：${score.toFixed(2)}`);
-            });
-            
-            alert(analysisResults.join('\n\n'));
-        }
 
        
             // 职业评分公式映射
@@ -758,6 +711,27 @@ function calculateScore(data) {
     const formula = classFormulas[data.class];
     return formula ? formula(data) : 0;
 }
+        // 分析选中项功能
+        function analyzeSelected() {
+            const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
+                .map((checkbox,index) => checkbox.checked ? index : -1)
+                .filter(i => i >= 0);
+
+            if (selectedIndexes.length === 0) {
+                alert('请至少选择一项要分析的数据');
+                return;
+            }
+            
+            let analysisResults = [];
+            
+            selectedIndexes.forEach(index => {
+                const data = rawBattleData[index];
+                const score = calculateScore(data); // 调用计算公式
+                analysisResults.push(`[${data.battleName}] ${data.player}(${data.class}) 得分：${score.toFixed(2)}`);
+            });
+            
+            alert(analysisResults.join('\n\n'));
+        }
     </script>
 </body>
 </html>
