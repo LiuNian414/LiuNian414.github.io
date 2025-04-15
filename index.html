@@ -151,24 +151,52 @@
 
     <button onclick="analyze()">提交分析</button>
 </div>
-<!-- 右侧新增数据表格 -->
-        <div class="data-section">
-            <table id="battleTable">
-                <thead>
-                    <tr>
-                        <th contenteditable="true">日期</th>
-                        <th contenteditable="true">对局名称</th>
-                        <th>玩家名称</th>
-                        <th>职业</th>
-                        <th>综合评分</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- 数据行由JavaScript动态生成 -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+<!-- 新增右侧表格结构 -->
+<div class="data-section">
+    <table id="battleTable" style="background:white;color:black;border-collapse:collapse;width:100%">
+        <thead>
+            <tr style="border-bottom:2px solid #ddd">
+                <th style="padding:12px;width:30px">✓</th>
+                <th style="padding:12px">日期</th>
+                <th style="padding:12px">对局名称</th>
+                <th>玩家名称职业</th>
+                <th>击败数</th>
+                <th>助攻数</th>
+                <th>战备资源</th>
+                <th>对建筑伤害</th>
+                <th>治疗值</th>
+                <th>承受伤害</th>
+                <th>重伤数</th>
+                <th>重伤数所在团长</th>
+                <th>所在团长</th>
+            </tr>
+        </thead>
+        <tbody id="battleDataBody">
+            <!-- 数据行示例 -->
+            <tr style="border-bottom:1px solid #eee">
+                <td><input type="checkbox"></td>
+                <td>2023-08-15</td>
+                <td>汴京决战</td>
+                <td>剑侠情缘@素问</td>
+                <td>5</td>
+                <td>12</td>
+                <td>260</td>
+                <td>0</td>
+                <td>8000</td>
+                <td>15000</td>
+                <td>3</td>
+                <td>战天下</td>
+                <td>战天下</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 按钮区改造 -->
+<div style="margin-top:20px;display:flex;gap:10px">
+    <button onclick="submitData()" style="background:#4CAF50">🔄提交</button>
+    <button onclick="analyzeSelected()" style="background:#2196F3">🔍分析选中项</button>
+</div>
 <script>
 // 职业系数默认值映射
 const CLASS_FACTORS = {
@@ -219,186 +247,67 @@ function collectInputData() {
 }
     
      
-// 新增战斗记录处理函数
-function handleBattleRecord(player) {
-    // 生成唯一ID
-    const recordId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-    
-    // 创建记录对象
-    const record = {
-        id: recordId,
-        date: player.date,
-        battleName: player.battleName,
-        playerData: {...player}
+// 数据存储结构改造
+let rawBattleData = [];
+
+// 🔄提交数据处理
+function submitData() {
+    const formData = {
+        date: document.getElementById('battleDate').value || new Date().toISOString().split('T')[0],
+        battleName: document.getElementById('battleName').value.trim() || "未命名对局",
+        player: document.getElementById('playerName').value,
+        class: document.getElementById('playerClass').value,
+        // 其他字段收集...
+        resources: parseInt(document.getElementById('resources').value) || 0,
+        buildingDamage: parseInt(document.getElementById('buildingDamage').value) || 0
     };
 
-    // 添加到数据存储
-    battleData.records.push(record);
-    
-    // 更新UI
-    updateBattleSelector();
-    updateBattleTable();
+    rawBattleData.push(formData);
+    updateDataTable();
 }
 
-// 新增选择框更新函数
-function updateBattleSelector() {
-    const selector = document.getElementById('battleSelector');
-    selector.innerHTML = '<option value="">-- 新建记录 --</option>';
-    
-    battleData.records.forEach(record => {
-        const option = document.createElement('option');
-        option.value = record.id;
-        option.textContent = `${record.date} - ${record.battleName}`;
-        selector.appendChild(option);
+// 🆕表格更新函数
+function updateDataTable() {
+    const tbody = document.getElementById('battleDataBody');
+    tbody.innerHTML = rawBattleData.map((data,index) => `
+        <tr>
+            <td><input type="checkbox" id="check${index}"></td>
+            <td>${data.date}</td>
+            <td>${data.battleName}</td>
+            <td>${data.player}@${data.class}</td>
+            <td>${data.kills || 0}</td>
+            <td>${data.assists || 0}</td>
+            <td>${data.resources}</td>
+            <td>${data.buildingDamage}</td>
+            <td>${data.heal || 0}</td>
+            <td>${data.damageTaken || 0}</td>
+            <td>${data.deaths || 0}</td>
+            <td>${data.deathLeader || '-'}</td>
+            <td>${data.teamLeader || '-'}</td>
+        </tr>
+    `).join('');
+}
+
+// 🆕分析选中项功能
+function analyzeSelected() {
+    const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
+        .map((checkbox,index) => checkbox.checked ? index : -1)
+        .filter(i => i >= 0);
+
+    selectedIndexes.forEach(index => {
+        const data = rawBattleData[index];
+        const score = calculateScore(data); // 调用计算公式
+        alert(`[${data.battleName}] ${data.player} 得分：${score.toFixed(2)}`);
     });
 }
 
-// 新增表格更新函数
-function updateBattleTable() {
-    const tbody = document.querySelector('#battleTable tbody');
-    tbody.innerHTML = '';
-    
-    battleData.records.forEach(record => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${record.date}</td>
-            <td>${record.battleName}</td>
-            <td>${record.playerData.name}</td>
-            <td>${record.playerData.class}</td>
-            <td>${record.playerData.score.toFixed(2)}</td>
-        `;
-        tbody.appendChild(row);
-    });
+// 计算公式封装
+function calculateScore(data) {
+    // 根据职业调用不同公式
+    const formula = classFormulas[data.class];
+    return formula ? formula(data) : 0;
 }
-
-// 修改后的分析函数
-function analyze() {
-    try {
-        const selectedBattle = document.getElementById('battleSelector').value;
-        
-        if (selectedBattle) {
-            // 分析已有记录
-            const record = battleData.records.find(r => r.id === selectedBattle);
-            if (record) {
-                alert(`已选择战斗记录：${record.battleName}\n当前评分：${record.playerData.score}`);
-            }
-        } else {
-            // 新建记录
-            const player = collectInputData();
-            const global = calculateGlobalStats();
-            
-            // 添加日期验证
-            if (!player.date) throw new Error('必须选择战斗日期');
-            if (!player.battleName) throw new Error('必须填写对局名称');
-            
-            player.score = classFormulas[player.class](player, global);
-            handleBattleRecord(player);
-            alert(`新建记录成功！评分：${player.score.toFixed(2)}`);
-        }
-    } catch (error) {
-        console.error('分析失败：', error);
-        alert(`分析失败：${error.message}`);
-    }
-}
-// 修改全局数据统计逻辑
-function calculateGlobalStats() {
-    const stats = { teams: {} };
-    
-    // 从所有记录中获取玩家数据（关键修复点）
-    const allPlayers = battleData.records.map(record => record.playerData);
-
-    // 初始化所有已有团队
-    const allTeams = [...new Set(allPlayers.map(p => p.teamLeader))];
-    allTeams.forEach(teamName => {
-        stats.teams[teamName] = {
-            totalDamage: 0,
-            totalHeal: 0,
-            totalDamageTaken: 0,
-            totalDeaths: 0,
-            members: [],
-            avgDamage: 0,
-            avgHeal: 0
-        };
-    });
-
-    // 统计团队数据（使用allPlayers替代battleData.players）
-    allPlayers.forEach(player => {
-        const team = stats.teams[player.teamLeader] || {
-            totalDamage: 0,
-            totalHeal: 0,
-            totalDamageTaken: 0,
-            totalDeaths: 0,
-            members: [],
-            avgDamage: 0,
-            avgHeal: 0
-        };
-        
-        team.members.push(player);
-        team.totalDamage += player.playerDamage + player.buildingDamage;
-        team.totalHeal += player.heal || 0;
-        team.totalDamageTaken += player.damageTaken || 0;
-        team.totalDeaths += player.deaths || 0;
-        
-        stats.teams[player.teamLeader] = team;
-    });
-
-    // 计算平均值（防止除以0）
-    Object.values(stats.teams).forEach(team => {
-        const dpsMembers = team.members.filter(m => m.class !== '素问');
-        const healerMembers = team.members.filter(m => m.class === '素问');
-        
-        team.avgDamage = dpsMembers.length > 0 
-            ? team.totalDamage / dpsMembers.length 
-            : 0;
-            
-        team.avgHeal = healerMembers.length > 0 
-            ? team.totalHeal / healerMembers.length 
-            : 0;
-    });
-
-    return stats;
-}
-
-// 修改数据存储结构（确保初始化时包含必要字段）
-let battleData = {
-    records: [],
-    currentSelected: null,
-    players: [] // 添加兼容字段防止未定义错误
-};
-    // 增强版公式实现
-const classFormulas = {
-    '素问': (player, global) => {
-        const team = global.teams[player.teamLeader];
-        const avgHeal = team.totalHeal / team.members.filter(m => m.class === '素问').length || 1;
-        return Number(((
-            ((player.heal + player.damageTaken/1.1 + 
-            (player.revive / team.totalDeaths * 2000)) / 
-            (avgHeal * 2) * 0.4) +
-            (player.heal / 2000 * 0.25) +
-            (player.resources / 260 * 0.02) +
-            (13 - player.deaths) * 0.01 +
-            (player.revive - 15) * 0.01
-        ) * player.classFactor).toFixed(2));
-    },
-    '铁衣': (player, global) => {
-        const team = global.teams[player.teamLeader];
-        const avgDamage = team.totalDamage / team.members.filter(m => m.class !== '素问').length || 1;
-        return Number(((
-            (((
-                (player.kills + player.assists*0.35 + 
-                (player.playerDamage*1.2 + player.buildingDamage*5)/100
-                ) / avgDamage * 10
-            ) +
-            (player.damageTaken / team.totalDamageTaken * 2)
-            ) * 0.6) +
-            (player.damageTaken / 5000 * 0.35) +
-            (player.resources / 260 * 0.03) +
-            (10 - player.deaths) * 0.015
-        ) * player.classFactor).toFixed(2));
-    },
-    // 其他职业公式...
-};
-    </script>
+</script>
 
 <style>
 /* 增强样式 */
