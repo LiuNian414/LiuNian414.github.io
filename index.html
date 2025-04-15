@@ -94,7 +94,6 @@
 </head>
 <body>
     <h1>逆水寒帮战分析系统</h1>
-    let rawBattleData = [];
     <div class="main-container">
         <!-- 左侧输入区域 -->
         <div class="input-section">
@@ -304,6 +303,7 @@
         classFactor: parseFloat(document.getElementById('classFactor').value) || 1.0
     };
 }
+        let rawBattleData = [];
          // 提交数据
 function submitData() {
     const formData = collectInputData();
@@ -321,7 +321,8 @@ function updateDataTable() {
             <td><input type="checkbox" id="check${index}"></td>
             <td>${data.date}</td>
             <td>${data.battleName}</td>
-            <td>${data.player}@${data.class}</td>
+            <td>${data.player}</td>
+            <td>${data.class}</td>
             <td>${data.kills}</td>
             <td>${data.assists}</td>
             <td>${data.resources}</td>
