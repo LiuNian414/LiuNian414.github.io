@@ -29,13 +29,17 @@
         
         /* 数据表格区域样式 */
         .data-section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            grid-column: 2 / span 2;
-            overflow-x: auto;
-        }
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    grid-column: 2 / span 2;
+    overflow-x: auto;
+    min-width: 0; /* 允许内容压缩 */
+    width: calc(100% + 100px); /* 增加100px宽度 */
+    margin-left: -50px; /* 向左扩展50px */
+    margin-right: -50px; /* 向右扩展50px */
+}
         
         /* 图表区域样式 */
         .charts { 
