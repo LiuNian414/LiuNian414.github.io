@@ -151,6 +151,15 @@
         .sortable.desc::after {
             content: "↓";
         }
+        /* 团队数据输入区域样式 */
+.team-data {
+    margin-top: 15px;
+    background: #ecf0f1;
+    padding: 15px !important;
+}
+.team-data .input-row {
+    grid-template-columns: 100px 1fr;
+}
     </style>
 </head>
 <body>
@@ -167,7 +176,25 @@
                 <label>对局名称</label>
                 <input type="text" id="battleName" required>
             </div>
-
+<!-- 新增团队数据输入 -->
+<div class="input-grid team-data">
+    <div class="input-row">
+        <label>团重伤次数</label>
+        <input type="number" id="totalDeaths" min="0" required>
+    </div>
+    <div class="input-row">
+        <label>团平均奶量</label>
+        <input type="number" id="avgHeal" min="0" required>
+    </div>
+    <div class="input-row">
+        <label>团平均伤害</label>
+        <input type="number" id="avgDamage" min="0" required>
+    </div>
+    <div class="input-row">
+        <label>团平均重伤次数</label>
+        <input type="number" id="avgDeaths" min="0" required>
+    </div>
+</div>
             <!-- 基础信息 -->
             <div class="input-grid">
                 <div class="input-row">
@@ -359,7 +386,11 @@
                 spring: parseInt(document.getElementById('spring').value) || 0,
                 boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
                 teamLeader: document.getElementById('teamLeader').value.trim(),
-                classFactor: parseFloat(document.getElementById('classFactor').value) || 1.0
+                classFactor: parseFloat(document.getElementById('classFactor').value) || 1.0,
+                totalDeaths: parseInt(document.getElementById('totalDeaths').value) || 0,
+        avgHeal: parseInt(document.getElementById('avgHeal').value) || 0,
+        avgDamage: parseInt(document.getElementById('avgDamage').value) || 0,
+        avgDeaths: parseInt(document.getElementById('avgDeaths').value) || 0,
             };
         }
         
@@ -516,28 +547,24 @@
         
         // 计算素问评分
         function calculateSuwenScore(data) {
-            // 计算全团重伤次数
-            const totalDeaths = rawBattleData.reduce((sum, item) => sum + (item.deaths || 0), 0);
-            // 计算团平均奶量
-            const totalHeal = rawBattleData.reduce((sum, item) => sum + (item.heal || 0), 0);
-            const avgHeal = totalHeal / Math.max(1, rawBattleData.length);
-            
-            // 素问公式
-            const score = (
-                (
-                    (
-                        (data.heal + data.damageTaken/1.1 + data.revive/totalDeaths*2000) / 
-                        Math.max(1, avgHeal) * 2
-                    ) * 0.4 + 
-                    data.heal/2000 * 0.25 + 
-                    data.resources/260 * 0.02 + 
-                    (13 - data.deaths) * 0.01 + 
-                    (data.revive - 15) * 0.01
-                ) * data.classFactor
-            );
-            
-            return score;
-        }
+    // 使用手动输入的团队数据
+    const totalDeaths = data.totalDeaths || 1; // 防止除以0
+    const avgHeal = data.avgHeal || 1;
+    
+    const score = (
+        (
+            (
+                (data.heal + data.damageTaken/1.1 + data.revive/totalDeaths*2000) / 
+                avgHeal * 2
+            ) * 0.4 + 
+            data.heal/2000 * 0.25 + 
+            data.resources/260 * 0.02 + 
+            (13 - data.deaths) * 0.01 + 
+            (data.revive - 15) * 0.01
+        ) * data.classFactor
+    );
+    return score;
+}
         
         // 职业评分公式映射
         const classFormulas = {
