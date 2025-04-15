@@ -92,35 +92,35 @@
     <!-- 战斗数据 -->
     <div class="input-grid">
         <div class="input-row">
-            <label>击败数：</label>
+            <label>击败数</label>
             <input type="number" id="kills" min="0" required>
         </div>
         <div class="input-row">
-            <label>助攻数：</label>
+            <label>助攻数</label>
             <input type="number" id="assists" min="0" required>
         </div>
         <div class="input-row">
-            <label>战备资源：</label>
+            <label>战备资源</label>
             <input type="number" id="resources" min="0" required>
         </div>
         <div class="input-row">
-            <label>对玩家伤害：</label>
+            <label>对玩家伤害</label>
             <input type="number" id="playerDamage" min="0" required>
         </div>
         <div class="input-row">
-            <label>对建筑伤害：</label>
+            <label>对建筑伤害</label>
             <input type="number" id="buildingDamage" min="0" required>
         </div>
         <div class="input-row">
-            <label>治疗值：</label>
+            <label>治疗值</label>
             <input type="number" id="heal" min="0">
         </div>
         <div class="input-row">
-            <label>承受伤害：</label>
+            <label>承受伤害</label>
             <input type="number" id="damageTaken" min="0" required>
         </div>
         <div class="input-row">
-            <label>重伤次数：</label>
+            <label>重伤次数</label>
             <input type="number" id="deaths" min="0" required>
         </div>
     </div>
@@ -128,29 +128,26 @@
     <!-- 职业特殊字段 -->
     <div class="input-grid special-fields">
         <div class="input-row" data-class="素问">
-            <label>化羽次数：</label>
+            <label>化羽次数</label>
             <input type="number" id="revive" min="0">
         </div>
         <div class="input-row" data-class="潮光">
-            <label>清泉次数：</label>
+            <label>清泉次数</label>
             <input type="number" id="spring" min="0">
         </div>
         <div class="input-row" data-class="九灵">
-            <label>焚骨次数：</label>
+            <label>焚骨次数</label>
             <input type="number" id="boneBurn" min="0">
         </div>
         <div class="input-row">
-            <label>所在团长：</label>
+            <label>所在团长</label>
             <input type="text" id="teamLeader" required>
         </div>
         <div class="input-row">
-            <label>职业系数：</label>
+            <label>职业系数</label>
             <input type="number" id="classFactor" step="0.01" min="0.5" max="2.0" required>
         </div>
     </div>
-
-    <button onclick="analyze()">提交分析</button>
-</div>
 <!-- 新增右侧表格结构 -->
 <div class="data-section">
     <table id="battleTable" style="background:white;color:black;border-collapse:collapse;width:100%">
@@ -163,11 +160,12 @@
                 <th>击败数</th>
                 <th>助攻数</th>
                 <th>战备资源</th>
+                <th>对玩家伤害</th>
                 <th>对建筑伤害</th>
                 <th>治疗值</th>
                 <th>承受伤害</th>
                 <th>重伤数</th>
-                <th>重伤数所在团长</th>
+                <th>化羽/清泉次数</th>
                 <th>所在团长</th>
             </tr>
         </thead>
