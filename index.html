@@ -20,125 +20,182 @@
     <h1>逆水寒帮战专业分析系统</h1>
     
     <div class="container">
-        <!-- 数据输入区 -->
-        <div class="input-section">
-            <div class="input-row">
-                <label>玩家名称</label>
-                <input type="text" id="playerName" required>
-            </div>
-            <div class="input-row">
-                <label>职业</label>
-                <select id="playerClass" onchange="toggleSpecialFields()">
-                    <option value="素问">素问</option>
-                    <option value="铁衣">铁衣</option>
-                    <option value="碎梦">碎梦</option>
-                    <option value="血河">血河</option>
-                    <option value="龙吟">龙吟</option>
-                    <option value="九灵">九灵</option>
-                    <option value="玄机">玄机</option>
-                    <option value="破铁">破铁</option>
-                    <option value="天问">天问</option>
-                    <option value="潮光">潮光</option>
-                    <!-- 其他职业选项 -->
-                </select>
-            </div>
-            <!-- 更多输入字段 -->
-            <div class="input-row">
-                <label>击败数</label>
-                <input type="number" id="kills" min="0" required>
-            </div>
-            <div class="input-row special-field" data-class="素问">
-                <label>治疗值</label>
-                <input type="number" id="heal" min="0">
-            </div>
-            <button onclick="analyze()">分析数据</button>
+        <!-- 在原有HTML结构中添加 -->
+<div class="input-section">
+    <h3>战斗数据录入</h3>
+    
+    <!-- 基础信息 -->
+    <div class="input-grid">
+        <div class="input-row">
+            <label>玩家名称：</label>
+            <input type="text" id="playerName" required>
         </div>
-
-        <!-- 可视化展示区 -->
-        <div class="charts">
-            <div id="radarChart" class="chart-container"></div>
-            <div id="teamCompare" class="chart-container"></div>
+        <div class="input-row">
+            <label>等级：</label>
+            <input type="number" id="level" min="1" max="90" required>
+        </div>
+        <div class="input-row">
+            <label>职业：</label>
+            <select id="playerClass" onchange="toggleSpecialFields()">
+                <option value="素问">素问</option>
+                <option value="铁衣">铁衣</option>
+                <option value="碎梦">碎梦</option>
+                <option value="血河">血河</option>
+                <option value="龙吟">龙吟</option>
+                <option value="九灵">九灵</option>
+                <option value="神相">神相</option>
+                <option value="玄机">玄机</option>
+                <option value="破铁">破铁</option>
+                <option value="天问">天问</option>
+                <option value="潮光">潮光</option>
+            </select>
         </div>
     </div>
 
-    <script>
-        // 数据存储结构
-        let battleData = {
-            players: [],
-            teams: {},
-            classStats: {}
-        };
+    <!-- 战斗数据 -->
+    <div class="input-grid">
+        <div class="input-row">
+            <label>击败数：</label>
+            <input type="number" id="kills" min="0" required>
+        </div>
+        <div class="input-row">
+            <label>助攻数：</label>
+            <input type="number" id="assists" min="0" required>
+        </div>
+        <div class="input-row">
+            <label>战备资源：</label>
+            <input type="number" id="resources" min="0" required>
+        </div>
+        <div class="input-row">
+            <label>对玩家伤害：</label>
+            <input type="number" id="playerDamage" min="0" required>
+        </div>
+        <div class="input-row">
+            <label>对建筑伤害：</label>
+            <input type="number" id="buildingDamage" min="0" required>
+        </div>
+        <div class="input-row">
+            <label>治疗值：</label>
+            <input type="number" id="heal" min="0">
+        </div>
+        <div class="input-row">
+            <label>承受伤害：</label>
+            <input type="number" id="damageTaken" min="0" required>
+        </div>
+        <div class="input-row">
+            <label>重伤次数：</label>
+            <input type="number" id="deaths" min="0" required>
+        </div>
+    </div>
 
-        // 职业专用公式库
-        const classFormulas = {
-            '素问': (player, globalStats) => {
-                const team = globalStats.teams[player.team];
-                return (
-                    (((player.heal + player.damageTaken/1.1 + 
-                      (player.revive / team.totalDeaths * 2000)) /
-                     (team.avgHeal * 2)) * 0.4 +
-                    (player.heal / 2000) * 0.25 +
-                    (player.resources / 260) * 0.02 +
-                    (13 - player.deaths) * 0.01 +
-                    (player.revive - 15) * 0.01) * 0.95
-                );
-            },
-            '铁衣': (player, globalStats) => {
-                const team = globalStats.teams[player.team];
-                return (
-                    ((((player.kills + player.assists*0.35 + 
-                       (player.playerDamage*1.2 + player.buildingDamage*5)/100) /
-                      team.avgDamage) * 10 +
-                     (player.damageTaken / team.totalDamageTaken) * 2) * 0.6 +
-                    (player.damageTaken / 5000) * 0.35 +
-                    (player.resources / 260) * 0.03 +
-                    (10 - player.deaths) * 0.015) * 1
-                );
-            },
-            // 其他职业公式...
-        };
+    <!-- 职业特殊字段 -->
+    <div class="input-grid special-fields">
+        <div class="input-row" data-class="素问">
+            <label>化羽次数：</label>
+            <input type="number" id="revive" min="0">
+        </div>
+        <div class="input-row" data-class="潮光">
+            <label>清泉次数：</label>
+            <input type="number" id="spring" min="0">
+        </div>
+        <div class="input-row" data-class="九灵">
+            <label>焚骨次数：</label>
+            <input type="number" id="boneBurn" min="0">
+        </div>
+        <div class="input-row">
+            <label>所在团长：</label>
+            <input type="text" id="teamLeader" required>
+        </div>
+        <div class="input-row">
+            <label>职业系数：</label>
+            <input type="number" id="classFactor" step="0.01" min="0.5" max="2.0" required>
+        </div>
+    </div>
 
-        // 核心分析逻辑
-        function analyze() {
-            const player = collectInputData();
-            const globalStats = calculateGlobalStats();
-            
-            player.score = classFormulas[player.class](player, globalStats);
-            
-            updateDataStore(player);
-            updateVisualizations();
-        }
+    <button onclick="analyze()">提交分析</button>
+</div>
 
-        // 数据收集函数
-        function collectInputData() {
-            return {
-                name: document.getElementById('playerName').value,
-                class: document.getElementById('playerClass').value,
-                kills: parseInt(document.getElementById('kills').value),
-                // 收集其他字段...
-                team: document.getElementById('team').value,
-                classFactor: parseFloat(document.getElementById('classFactor').value)
-            };
-        }
+<script>
+// 职业系数默认值映射
+const CLASS_FACTORS = {
+    '素问': 0.95,
+    '铁衣': 1.0,
+    '碎梦': 1.2,
+    '血河': 0.95,
+    '龙吟': 1.0,
+    '九灵': 1.0,
+    '神相': 1.0,
+    '玄机': 1.0,
+    '破铁': 1.1,
+    '天问': 1.0,
+    '潮光': 0.95
+};
 
-        // 全局统计计算
-        function calculateGlobalStats() {
-            return {
-                teams: calculateTeamStats(),
-                classStats: calculateClassStats()
-            };
-        }
+// 动态显示职业特殊字段
+function toggleSpecialFields() {
+    const selectedClass = document.getElementById('playerClass').value;
+    document.querySelectorAll('.special-fields [data-class]').forEach(field => {
+        field.style.display = field.dataset.class === selectedClass ? 'flex' : 'none';
+    });
+    
+    // 自动填充职业系数
+    document.getElementById('classFactor').value = CLASS_FACTORS[selectedClass];
+}
 
-        // 可视化更新
-        function updateVisualizations() {
-            renderRadarChart();
-            renderTeamComparison();
-        }
+// 数据收集增强版
+function collectInputData() {
+    return {
+        name: document.getElementById('playerName').value.trim(),
+        level: parseInt(document.getElementById('level').value),
+        class: document.getElementById('playerClass').value,
+        kills: parseInt(document.getElementById('kills').value),
+        assists: parseInt(document.getElementById('assists').value),
+        resources: parseInt(document.getElementById('resources').value),
+        playerDamage: parseInt(document.getElementById('playerDamage').value),
+        buildingDamage: parseInt(document.getElementById('buildingDamage').value),
+        heal: parseInt(document.getElementById('heal').value) || 0,
+        damageTaken: parseInt(document.getElementById('damageTaken').value),
+        deaths: parseInt(document.getElementById('deaths').value),
+        revive: parseInt(document.getElementById('revive').value) || 0,
+        spring: parseInt(document.getElementById('spring').value) || 0,
+        boneBurn: parseInt(document.getElementById('boneBurn').value) || 0,
+        teamLeader: document.getElementById('teamLeader').value.trim(),
+        classFactor: parseFloat(document.getElementById('classFactor').value)
+    };
+}
+</script>
 
-        // GitHub Pages部署准备
-        function saveData() {
-            localStorage.setItem('battleData', JSON.stringify(battleData));
-        }
+<style>
+/* 增强样式 */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+    padding: 10px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.special-fields [data-class] {
+    display: none;
+}
+
+input[type="number"] {
+    width: 100px;
+}
+
+select {
+    width: 150px;
+}
+</style>
     </script>
 </body>
 </html>
