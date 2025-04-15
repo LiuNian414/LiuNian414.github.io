@@ -195,11 +195,7 @@ function toggleSpecialFields() {
     // 自动填充职业系数
     document.getElementById('classFactor').value = CLASS_FACTORS[selectedClass];
 }
-// 修改数据存储结构
-let battleData = {
-    records: [],
-    currentSelected: null
-};
+
 // 数据收集增强版
 function collectInputData() {
     return {
@@ -336,12 +332,15 @@ function analyze() {
         alert(`分析失败：${error.message}`);
     }
 }
-// 增强全局统计函数
+// 修改全局数据统计逻辑
 function calculateGlobalStats() {
     const stats = { teams: {} };
     
+    // 从所有记录中获取玩家数据（关键修复点）
+    const allPlayers = battleData.records.map(record => record.playerData);
+
     // 初始化所有已有团队
-    const allTeams = [...new Set(battleData.players.map(p => p.teamLeader))];
+    const allTeams = [...new Set(allPlayers.map(p => p.teamLeader))];
     allTeams.forEach(teamName => {
         stats.teams[teamName] = {
             totalDamage: 0,
@@ -354,8 +353,8 @@ function calculateGlobalStats() {
         };
     });
 
-    // 统计团队数据
-    battleData.players.forEach(player => {
+    // 统计团队数据（使用allPlayers替代battleData.players）
+    allPlayers.forEach(player => {
         const team = stats.teams[player.teamLeader] || {
             totalDamage: 0,
             totalHeal: 0,
@@ -392,16 +391,12 @@ function calculateGlobalStats() {
     return stats;
 }
 
-// 增强数据收集时的默认值处理
-function collectInputData() {
-    return {
-        teamLeader: document.getElementById('teamLeader').value || '默认团队',
-        heal: parseInt(document.getElementById('heal').value) || 0,
-        damageTaken: parseInt(document.getElementById('damageTaken').value) || 0,
-        deaths: parseInt(document.getElementById('deaths').value) || 0,
-        // 其他字段...
-    };
-}
+// 修改数据存储结构（确保初始化时包含必要字段）
+let battleData = {
+    records: [],
+    currentSelected: null,
+    players: [] // 添加兼容字段防止未定义错误
+};
     </script>
 
 <style>
