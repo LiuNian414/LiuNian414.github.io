@@ -28,17 +28,18 @@
 }
         
         /* 数据表格区域样式 */
-        .data-section {
+       .data-section {
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     grid-column: 2 / span 2;
     overflow-x: auto;
-    /* 新增以下属性 */
-    width: 500px; /* 改为自动宽度 */
-    max-width: calc(100% - 320px); /* 限制最大宽度（左侧输入区约300px+间距） */
-    margin-left: 20px; /* 与左侧保持固定间距 */
+    /* 新增以下对齐调整 */
+    width: calc(100% - 40px); /* 减去左右padding */
+    margin-right: 0; /* 取消右margin */
+    position: relative;
+    right: -20px; /* 微调对齐位置 */
 }
         
         /* 图表区域样式 */
@@ -94,7 +95,9 @@
             margin-top: 20px;
             display: flex;
             gap: 10px;
-            grid-column: 1 / span 3;
+            grid-column: 2 / span 2; /* 与data-section保持相同列宽 */
+    padding-right: 20px; /* 与section的padding匹配 */
+    box-sizing: border-box;
         }
 
         .button-area button:last-child {
