@@ -91,24 +91,41 @@
         }
         
         /* 按钮区域样式 */
-        button-area {
-    display: grid;
-    grid-template-columns: 300px 1fr; /* 第一列宽度与input-section相同 */
-    gap: 10px;
+       .button-area {
+    display: flex;
+    justify-content: space-between;
     margin-top: 20px;
+    grid-column: 1 / span 3; /* 跨全部三列 */
+}
+/* 左侧按钮组 */
+.button-left {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    min-width: 300px; /* 与input-section同宽 */
+}
+        /* 右侧按钮组 */
+.button-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+/* 提交按钮样式 */
+.button-area button:first-child {
+    background: #4CAF50;
+    margin-right: auto; /* 左对齐 */
 }
 
-
-        .button-area button:first-child {
-    grid-column: 1; /* 放在第一列 */
-    margin-left: 0;
-    width: calc(100% - 20px); /* 减去input-section的padding */
+/* 分析选中项按钮样式 */
+.button-area button:nth-child(2) {
+    background: #2196F3;
+    margin-left: auto; /* 在中间组右对齐 */
 }
 
-        /* 其他按钮保持右对齐 */
+/* 删除选中项按钮样式 */
 .button-area button:last-child {
-    margin-left: auto;
-    grid-column: 2;
+    background: #f44336;
+    margin-left: 20px; /* 最右侧 */
 }
         
         /* 排序按钮样式 */
