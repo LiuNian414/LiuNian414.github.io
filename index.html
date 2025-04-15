@@ -94,7 +94,7 @@
 </head>
 <body>
     <h1>逆水寒帮战分析系统</h1>
-    
+    let rawBattleData = [];
     <div class="main-container">
         <!-- 左侧输入区域 -->
         <div class="input-section">
@@ -307,11 +307,12 @@
          // 提交数据
 function submitData() {
     const formData = collectInputData();
-    rawBattleData.push(formData);
-    updateDataTable();
-    console.log("当前数据:", rawBattleData);  // 调试用
+    saveToLocalStorage(formData);
+    rawBattleData = loadFromLocalStorage(); // 重新加载数据
+    updateDataTable(); // 更新表格内容
+    console.log("当前数据:", rawBattleData); // 调试输出
 }
-   
+ 
        // 更新表格
 function updateDataTable() {
     const tbody = document.getElementById('battleDataBody');
@@ -334,7 +335,11 @@ function updateDataTable() {
         </tr>
     `).join('');
 }
-       
+  document.addEventListener('DOMContentLoaded', () => {
+    rawBattleData = loadFromLocalStorage();
+    updateDataTable();  // 确保表格正确渲染
+});
+        
 // 保存数据到localStorage
 function saveToLocalStorage(data) {
     const savedData = JSON.parse(localStorage.getItem('battleData') || '[]');
