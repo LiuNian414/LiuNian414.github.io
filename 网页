@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>逆水寒全职业帮战分析系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        :root { --primary-color: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .input-group { display: flex; flex-direction: column; margin: 8px 0; }
+        .input-group label { font-weight: 500; margin-bottom: 5px; color: var(--primary-color); }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .special-field { display: none; background: #f8f9fa; padding: 8px; border-radius: 4px; }
+        button { background: #3498db; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; }
+        .charts { margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .chart-container { height: 500px; border: 1px solid #eee; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h1>全职业帮战数据分析系统</h1>
+    
+    <!-- 数据输入区 -->
+    <div class="data-form">
+        <div class="grid-container">
+            <!-- 基础信息 -->
+            <div class="input-group">
+                <label>玩家名称</label>
+                <input type="text" id="playerName" required>
+            </div>
+            <div class="input-group">
+                <label>等级</label>
+                <input type="number" id="level" required>
+            </div>
+            <div class="input-group">
+                <label>职业</label>
+                <select id="playerClass" onchange="toggleSpecialFields()">
+                    <option value="素问">素问</option>
+                    <option value="铁衣">铁衣</option>
+                    <option value="碎梦">碎梦</option>
+                    <option value="血河">血河</option>
+                    <option value="龙吟">龙吟</option>
+                    <option value="九灵">九灵</option>
+                    <option value="神相">神相</option>
+                    <option value="玄机">玄机</option>
+                    <option value="破铁">破铁</option>
+                    <option value="天问">天问</option>
+                    <option value="潮光">潮光</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>所在团长</label>
+                <input type="text" id="teamLeader" required>
+            </div>
+
+            <!-- 战斗数据 -->
+            <div class="input-group">
+                <label>击败数</label>
+                <input type="number" id="kills" required>
+            </div>
+            <div class="input-group">
+                <label>助攻数</label>
+                <input type="number" id="assists" required>
+            </div>
+            <div class="input-group">
+                <label>战备资源</label>
+                <input type="number" id="resources" required>
+            </div>
+            <div class="input-group">
+                <label>对玩家伤害</label>
+                <input type="number" id="playerDamage" required>
+            </div>
+            <div class="input-group">
+                <label>对建筑伤害</label>
+                <input type="number" id="structureDamage" required>
+            </div>
+            <div class="input-group">
+                <label>治疗值</label>
+                <input type="number" id="heal">
+            </div>
+            <div class="input-group">
+                <label>承受伤害</label>
+                <input type="number" id="damageTaken">
+            </div>
+            <div class="input-group">
+                <label>重伤次数</label>
+                <input type="number" id="downCount" required>
+            </div>
+
+            <!-- 职业特殊字段 -->
+            <div id="suwenField" class="special-field">
+                <label>化羽次数</label>
+                <input type="number" id="featherCount">
+            </div>
+            <div id="jiulingField" class="special-field">
+                <label>焚骨次数</label>
+                <input type="number" id="boneBurnCount">
+            </div>
+            <div id="chaoguangField" class="special-field">
+                <label>清泉次数</label>
+                <input type="number" id="springCount">
+            </div>
+        </div>
+        <button onclick="analyze()">开始分析</button>
+    </div>
+
+    <!-- 可视化展示 -->
+    <div class="charts">
+        <div id="radarChart" class="chart-container"></div>
+        <div id="scoreChart" class="chart-container"></div>
+    </div>
+
+<script>
+let allPlayers = JSON.parse(localStorage.getItem('battleData')) || [];
+
+// 动态显示职业特殊字段
+function toggleSpecialFields() {
+    const cls = document.getElementById('playerClass').value;
+    document.querySelectorAll('.special-field').forEach(f => f.style.display = 'none');
+    if(cls === '素问') document.getElementById('suwenField').style.display = 'block';
+    if(cls === '九灵') document.getElementById('jiulingField').style.display = 'block'; 
+    if(cls === '潮光') document.getElementById('chaoguangField').style.display = 'block';
+}
+
+// 核心计算公式库
+const formulas = {
+    素问: (player, teamData) => {
+        const avgHeal = teamData.filter(p => p.class === '素问').reduce((a,b) => a + b.heal, 0) / teamData.length;
+        return (((player.heal + player.damageTaken/1.1 + (player.featherCount / teamData.downCount * 2000)) 
+               / (avgHeal * 2)) * 0.4 
+               + player.heal/2000 * 0.25 
+               + player.resources/260 * 0.02 
+               + (13 - player.downCount)*0.01 
+               + (player.featherCount - 15)*0.01) * 0.95;
+    },
+    
+    铁衣: (player, teamData) => {
+        const avgDps = teamData.filter(p => !['素问'].includes(p.class))
+                             .reduce((a,b) => a + b.playerDamage + b.structureDamage, 0) / teamData.length;
+        return ((((player.kills + player.assists*0.35 + (player.playerDamage*1.2 + player.structureDamage*5)/100) 
+               / avgDps) * 10 
+               + (player.damageTaken / teamData.totalDamageTaken) * 2) * 0.6 
+               + player.damageTaken/5000 * 0.35 
+               + player.resources/260 * 0.03 
+               + (10 - player.downCount)*0.015) * 1;
+    },
+    
+    // 其他职业公式...
+};
+
+function analyze() {
+    const playerData = {
+        // 基础信息
+        name: document.getElementById('playerName').value,
+        class: document.getElementById('playerClass').value,
+        level: parseInt(document.getElementById('level').value),
+        teamLeader: document.getElementById('teamLeader').value,
+        
+        // 战斗数据
+        kills: parseInt(document.getElementById('kills').value),
+        assists: parseInt(document.getElementById('assists').value),
+        resources: parseInt(document.getElementById('resources').value),
+        playerDamage: parseInt(document.getElementById('playerDamage').value),
+        structureDamage: parseInt(document.getElementById('structureDamage').value),
+        heal: parseInt(document.getElementById('heal').value) || 0,
+        damageTaken: parseInt(document.getElementById('damageTaken').value) || 0,
+        downCount: parseInt(document.getElementById('downCount').value),
+        
+        // 特殊字段
+        featherCount: parseInt(document.getElementById('featherCount').value) || 0,
+        boneBurnCount: parseInt(document.getElementById('boneBurnCount').value) || 0,
+        springCount: parseInt(document.getElementById('springCount').value) || 0
+    };
+
+    // 计算团队基准数据
+    const teamData = {
+        totalDamageTaken: allPlayers.reduce((a,b) => a + b.damageTaken, 0),
+        downCount: allPlayers.reduce((a,b) => a + b.downCount, 0),
+        // 其他团队指标...
+    };
+
+    // 执行职业专属公式
+    playerData.score = formulas[playerData.class](playerData, teamData);
+    
+    // 保存并更新图表
+    allPlayers.push(playerData);
+    localStorage.setItem('battleData', JSON.stringify(allPlayers));
+    updateCharts();
+}
+
+// 图表更新逻辑与之前类似...
+</script>
+</body>
+</html>
