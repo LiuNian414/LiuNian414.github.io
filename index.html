@@ -334,7 +334,33 @@ function updateDataTable() {
         </tr>
     `).join('');
 }
+       
+// 保存数据到localStorage
+function saveToLocalStorage(data) {
+    const savedData = JSON.parse(localStorage.getItem('battleData') || '[]');
+    savedData.push(data);
+    localStorage.setItem('battleData', JSON.stringify(savedData));
+}
 
+// 从localStorage加载数据
+function loadFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('battleData') || '[]');
+}
+
+// 修改submitData函数
+function submitData() {
+    const formData = collectInputData();
+    saveToLocalStorage(formData);
+    rawBattleData = loadFromLocalStorage();
+    updateDataTable();
+}
+
+// 页面加载时
+document.addEventListener('DOMContentLoaded', () => {
+    rawBattleData = loadFromLocalStorage();
+    updateDataTable();
+});
+        
         // 🆕分析选中项功能
         function analyzeSelected() {
             const selectedIndexes = [...document.querySelectorAll('input[type="checkbox"]')]
@@ -354,7 +380,6 @@ function updateDataTable() {
             const formula = classFormulas[data.class];
             return formula ? formula(data) : 0;
         }
-
     </script>
 <style>
 /* 增强样式 */
