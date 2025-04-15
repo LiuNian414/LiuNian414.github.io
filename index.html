@@ -18,12 +18,14 @@
         
         /* 输入区域样式 */
         .input-section { 
-            background: #f8f9fa; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            grid-column: 1;
-        }
+    background: #f8f9fa; 
+    padding: 20px 15px;  /* 调整左右padding */
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    grid-column: 1;
+    min-height: 800px;  /* 增加最小高度 */
+    overflow-y: auto;  /* 添加垂直滚动条 */
+}
         
         /* 数据表格区域样式 */
         .data-section {
