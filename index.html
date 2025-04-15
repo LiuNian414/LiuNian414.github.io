@@ -330,12 +330,12 @@
             tbody.innerHTML = rawBattleData.map((data,index) => `
                 <tr>
                     <td><input type="checkbox" id="check${index}"></td>
-                    <td>${data.battleDate}</td>
+                    <td>${data.date}</td>
                     <td>${data.battleName}</td>
                     <td>${data.playerName}</td>
                     <td>${data.playerclass}</td>
-                    <td>${data.kills || 0}</td>
-                    <td>${data.assists || 0}</td>
+                    <td>${data.number.kills || 0}</td>
+                    <td>${data.number.assists || 0}</td>
                     <td>${data.resources}</td>
                     <td>${data.playerDamage}</td>
                     <td>${data.buildingDamage}</td>
