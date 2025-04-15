@@ -600,12 +600,164 @@
             alert(analysisResults.join('\n\n'));
         }
 
-        // 计算公式封装
-        function calculateScore(data) {
-            // 根据职业调用不同公式
-            const formula = classFormulas[data.class];
-            return formula ? formula(data) : 0;
-        }
+       
+            // 职业评分公式映射
+const classFormulas = {
+    '素问': function(data) {
+        const totalDeaths = data.totalDeaths || 1;
+        const avgHeal = data.avgHeal || 1;
+        return (
+            (
+                (
+                    (data.heal + data.damageTaken/1.1 + data.revive/totalDeaths*2000) / 
+                    avgHeal * 2
+                ) * 0.4 + 
+                data.heal/2000 * 0.25 + 
+                data.resources/260 * 0.02 + 
+                (13 - data.deaths) * 0.01 + 
+                (data.revive - 15) * 0.01
+            ) * data.classFactor
+        );
+    },
+    '铁衣': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const totalDamageTaken = data.totalDamageTaken || 1;
+        return (
+            (
+                (
+                    (data.kills + data.assists*0.35 + (data.playerDamage*1.2 + data.buildingDamage*5)/100) / 
+                    avgDamage * 10 + 
+                    data.damageTaken / totalDamageTaken * 2
+                ) * 0.6 + 
+                data.damageTaken/5000 * 0.35 + 
+                data.resources/260 * 0.03 + 
+                (10 - data.deaths) * 0.015
+            ) * data.classFactor
+        );
+    },
+    '碎梦': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills*2.5 + data.assists*0.15 + (data.playerDamage*1.5 + data.buildingDamage*5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/60 + data.assists/500 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                (16 - data.deaths) * 0.01
+            ) * data.classFactor
+        );
+    },
+    '血河': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills*1 + data.assists*0.15 + (data.playerDamage*1 + data.buildingDamage*5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/80 + data.assists/500 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                (16 - data.deaths) * 0.01 + 
+                data.damageTaken/2500 * 0.1
+            ) * data.classFactor
+        );
+    },
+    '龙吟': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills + data.assists*0.15 + (data.playerDamage*1 + data.buildingDamage*5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/80 + data.assists/500 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                (16 - data.deaths) * 0.01
+            ) * data.classFactor
+        );
+    },
+    '九灵': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills + data.assists*0.05 + (data.playerDamage + data.buildingDamage*5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/80 + data.assists/600 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                (14 - data.deaths) * 0.01 + 
+                (data.boneBurn / (data.totalBoneBurn || 1)) * 0.15 + 
+                (data.boneBurn / (data.totalKills || 1)) * 0.15
+            ) * data.classFactor
+        );
+    },
+    '神相': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills + data.assists*0.15 + (data.playerDamage + data.buildingDamage*5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/80 + data.assists/500 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                (14 - data.deaths) * 0.01
+            ) * data.classFactor
+        );
+    },
+    '玄机': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills + data.assists*0.15 + (data.playerDamage + data.buildingDamage*5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/80 + data.assists/500 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                (13 - data.deaths) * 0.01
+            ) * data.classFactor
+        );
+    },
+    '潮光': function(data) {
+        const avgDamage = data.avgDamage || 1;
+        const avgDeaths = data.avgDeaths || 0;
+        return (
+            (
+                (
+                    (data.kills + data.assists*0.15 + (data.playerDamage*1 + data.buildingDamage*5.5)/100 * 3 - 
+                    (data.deaths - avgDeaths)*2) / 
+                    avgDamage * 9
+                ) * 0.7 + 
+                (data.kills/80 + data.assists/500 + (data.playerDamage*1.2 + data.buildingDamage*1)/3000) * 0.3 + 
+                data.resources/260 * 0.03 + 
+                data.spring * 0.02 + 
+                (13 - data.deaths) * 0.01
+            ) * data.classFactor
+        );
+    }
+};
+
+// 计算公式封装
+function calculateScore(data) {
+    const formula = classFormulas[data.class];
+    return formula ? formula(data) : 0;
+}
     </script>
 </body>
 </html>
